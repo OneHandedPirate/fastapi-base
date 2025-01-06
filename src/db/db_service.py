@@ -36,8 +36,8 @@ class DataBaseService:
     async def dispose(self: Self) -> None:
         await self.engine.dispose()
 
-    async def session_getter(self: Self) -> AsyncGenerator[AsyncSession, None]:
-        async with self.session_factory() as session:
+    async def get_async_session(self: Self) -> AsyncGenerator[AsyncSession, None]:
+        async with self.async_session_factory() as session:
             yield session
 
 
