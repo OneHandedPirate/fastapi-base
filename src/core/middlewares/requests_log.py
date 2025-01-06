@@ -1,8 +1,10 @@
 import time
 import logging
 from logging.handlers import RotatingFileHandler
+from typing import Callable, Awaitable
 
-from fastapi import requests, responses
+from fastapi.responses import Response
+from fastapi.requests import Request
 from starlette.datastructures import QueryParams
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -14,7 +16,6 @@ class RequestsLogMiddleware(BaseHTTPMiddleware):
     My workaround of the issue when access_log_format is not working with
     UvicornWorker worker_class with gunicorn, so we can't use the following
     syntax: https://docs.gunicorn.org/en/latest/settings.html#access-log-format
-
     """
 
     LOGGER: logging.Logger = logging.Logger("requests", level=logging.INFO)
@@ -27,11 +28,13 @@ class RequestsLogMiddleware(BaseHTTPMiddleware):
     HANDLER.setFormatter(FORMATTER)
     LOGGER.addHandler(HANDLER)
 
-    async def dispatch(self, request: requests.Request, call_next):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         body: bytes = await request.body()
         query: QueryParams = request.query_params
         start_time: float = time.perf_counter()
-        response: responses.Response = await call_next(request)
+        response: Response = await call_next(request)
 
         response_time: str = f"{time.perf_counter() - start_time:.5f}"
 
