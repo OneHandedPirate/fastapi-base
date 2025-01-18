@@ -1,7 +1,8 @@
+import json
 import time
 import logging
 from logging.handlers import RotatingFileHandler
-from typing import Callable, Awaitable
+from typing import Callable, Awaitable, Any
 
 from fastapi.responses import Response
 from fastapi.requests import Request
@@ -36,6 +37,16 @@ class RequestsLogMiddleware(BaseHTTPMiddleware):
         start_time: float = time.perf_counter()
         response: Response = await call_next(request)
 
+        content_type: str = request.headers.get("content-type", "")
+        if body and content_type.startswith("application/json"):
+            try:
+                body_content: Any = json.loads(body)
+                body_str: str = json.dumps(body_content)
+            except json.JSONDecodeError:
+                body_str = "Invalid JSON"
+        else:
+            body_str = f"Non-JSON body, Content-Type: {content_type}"
+
         response_time: str = f"{time.perf_counter() - start_time:.5f}"
 
         self.LOGGER.info(
@@ -43,9 +54,7 @@ class RequestsLogMiddleware(BaseHTTPMiddleware):
             request.method,
             request.url.path,
             f" | QueryParams: {query}" if query else "",
-            f" | Body: {body.decode().replace('\n', ' ').replace(' ', '')}"
-            if body
-            else "",
+            f" | Body: {body_str}" if body else "",
             response.status_code,
             response_time,
         )
