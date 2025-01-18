@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
 
@@ -11,7 +12,7 @@ from src.apps.v1 import router as api_v1_router
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
     await db_service.dispose()
 

@@ -1,1 +1,1 @@
-from .requests_log import RequestsLogMiddleware
+from .requests_log import RequestsLogMiddleware as RequestsLogMiddleware

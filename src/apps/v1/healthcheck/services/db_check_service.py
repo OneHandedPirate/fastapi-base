@@ -1,5 +1,5 @@
 import time
-from typing import Annotated, Self
+from typing import Annotated, Self, Literal
 
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,12 +21,12 @@ class DBHealthCheckService(BaseHealthCheckServiceProtocol):
     async def execute(self: Self) -> ServiceHealthcheckResponseSchema:
         error_message: str | None = None
         start: float = time.perf_counter()
+        status: Literal["OK", "ERROR"] = "OK"
         try:
             await self.db_session.execute(text("SELECT 1"))
-            status: str = "OK"
         except Exception as e:
-            status: str = "ERROR"
-            error_message: str = str(e)
+            status = "ERROR"
+            error_message = str(e)
         finally:
             elapsed_time: float = round(time.perf_counter() - start, 5)
 

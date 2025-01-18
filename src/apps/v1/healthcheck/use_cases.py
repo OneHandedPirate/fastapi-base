@@ -6,13 +6,12 @@ from fastapi import Depends
 from src.apps.v1.healthcheck.services import DBHealthCheckService
 from src.apps.v1.healthcheck.services.protocols import BaseHealthCheckServiceProtocol
 from src.apps.v1.healthcheck.schemas import (
-    APIResponseSchema,
     ServiceStatusResponseSchema,
 )
 
 
 class HealthCheckUseCaseProtocol(Protocol):
-    async def check(self: Self) -> APIResponseSchema: ...
+    async def check(self: Self) -> ServiceStatusResponseSchema: ...
 
 
 class HealthCheckUseCaseImpl(HealthCheckUseCaseProtocol):

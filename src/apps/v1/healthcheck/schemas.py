@@ -3,7 +3,7 @@ from typing import Literal, Optional
 from pydantic import BaseModel
 
 
-class APIResponseSchema(BaseModel):
+class GeneralHeathCheckResponse(BaseModel):
     status: str = "OK"
 
 

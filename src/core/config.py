@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import BaseModel, PostgresDsn
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,7 +9,13 @@ BASE_DIR: Path = Path(__file__).parent.parent.parent
 
 
 class DBConfig(BaseModel):
-    url: PostgresDsn
+    user: str = "user"
+    password: str = "password"
+    host: str = "localhost"
+    port: int = 5432
+    name: str = "db_name"
+    provider: str = "postgresql+asyncpg"
+
     echo: bool = False
     echo_pool: bool = False
     pool_size: int = 50
@@ -22,6 +28,10 @@ class DBConfig(BaseModel):
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
     }
+
+    @property
+    def url(self: Self) -> str:
+        return f"{self.provider}://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
 
 
 class GunicornConfig(BaseModel):
@@ -61,6 +71,7 @@ class CorsConfig(BaseModel):
             "OPTIONS",
             "TRACE",
             "CONNECT",
+            "*",
         ]
     ] = ["*"]
     allow_headers: list[str] = ["*"]
@@ -73,7 +84,7 @@ class DevConfig(BaseModel):
 
 
 class Settings(BaseSettings):
-    db: DBConfig
+    db: DBConfig = DBConfig()
     gunicorn: GunicornConfig = GunicornConfig()
     fastapi: FastApiConfig = FastApiConfig()
     cors: CorsConfig = CorsConfig()

@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from src.apps.v1.healthcheck.schemas import (
-    APIResponseSchema,
     ServiceStatusResponseSchema,
+    GeneralHeathCheckResponse,
 )
 from src.apps.v1.healthcheck.use_cases import (
     HealthCheckUseCaseProtocol,
@@ -15,12 +15,12 @@ from src.apps.v1.healthcheck.use_cases import (
 router = APIRouter(prefix="/healthcheck", tags=["healthcheck"])
 
 
-@router.get("/status", response_model=APIResponseSchema)
-async def get_status():
+@router.get("/status", response_model=GeneralHeathCheckResponse)
+async def get_status() -> GeneralHeathCheckResponse:
     """
     General API healthcheck endpoint.
     """
-    return APIResponseSchema()
+    return GeneralHeathCheckResponse()
 
 
 @router.get("/service-status", response_model=ServiceStatusResponseSchema)

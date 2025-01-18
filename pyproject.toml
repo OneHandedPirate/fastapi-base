@@ -14,3 +14,18 @@ dependencies = [
     "sqlalchemy>=2.0.37",
     "uvicorn[standard]>=0.34.0",
 ]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14.1",
+    "ruff>=0.9.1",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+extend-exclude = ["alembic"]
+
+[tool.mypy]
+strict = true
+exclude = ["alembic"]
