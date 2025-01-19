@@ -129,6 +129,7 @@ class BaseSQLAlchemyRepositoryImpl(
                     .returning(self.model_type)
                 )
                 item = (await session.execute(stmt)).scalar_one()
+                await session.commit()
 
                 return self.read_schema_type.model_validate(item, from_attributes=True)
         except Exception as e:
@@ -143,6 +144,7 @@ class BaseSQLAlchemyRepositoryImpl(
                 items = (
                     await session.scalars(stmt, [x.model_dump() for x in data])
                 ).all()
+                await session.commit()
 
                 return [
                     self.read_schema_type.model_validate(item, from_attributes=True)
@@ -161,6 +163,8 @@ class BaseSQLAlchemyRepositoryImpl(
                     .values(data.model_dump(exclude={"id"}, exclude_unset=True))
                 )
                 item = (await session.execute(stmt)).scalar_one()
+                await session.commit()
+
                 return self.read_schema_type.model_validate(item, from_attributes=True)
         except Exception as e:
             self.handle_errors(e)
@@ -176,6 +180,7 @@ class BaseSQLAlchemyRepositoryImpl(
                         stmt, [x.model_dump(exclude_unset=True) for x in data]
                     )
                 ).all()
+                await session.commit()
 
                 return [
                     self.read_schema_type.model_validate(item, from_attributes=True)
@@ -189,6 +194,8 @@ class BaseSQLAlchemyRepositoryImpl(
             async with self.session as session:
                 stmt = sa.delete(self.model_type).where(self.model_type.id == id)
                 await session.execute(stmt)
+                await session.commit()
+
             return None
         except Exception as e:
             self.handle_errors(e)
